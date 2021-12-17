@@ -1,8 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"github.com/tetratelabs/proxy-wasm-go-sdk/proxywasm"
 	"github.com/tetratelabs/proxy-wasm-go-sdk/proxywasm/types"
+	"regexp"
+)
+
+var (
+	blockMessage = "This request has been blocked for security reasons."
+
+	regexRules = []string{
+		"(?i)(\\$|%24)(\\{|%7b).*j.*n.*d.*i.*(:|%3a)",
+	}
 )
 
 type vmContext struct {
@@ -24,9 +34,23 @@ func (*httpContext) OnHttpRequestHeaders(numHeaders int, endOfStream bool) types
 			proxywasm.LogCriticalf("failed to get request headers: %v", err)
 		}
 
-		for _, header := range headers {
-			proxywasm.LogInfof("%s: %s", header[0], header[1])
+		fullHeaders := fmt.Sprintf("%v", headers)
+		for _, rule := range regexRules {
+			regex, err := regexp.Compile(rule)
+			if err != nil {
+				proxywasm.LogCriticalf("%v", err)
+			} else {
+				if regex.MatchString(fullHeaders) {
+					err := proxywasm.SendHttpResponse(302, nil, []byte(blockMessage), -1)
+					if err != nil {
+						proxywasm.LogCriticalf("%v", err)
+					}
+
+					return types.ActionPause
+				}
+			}
 		}
+
 		return types.ActionContinue
 	}
 	return types.ActionPause
@@ -38,7 +62,23 @@ func (*httpContext) OnHttpRequestBody(bodySize int, endOfStream bool) types.Acti
 		if err != nil {
 			proxywasm.LogCriticalf("failed to get request body: %v", err)
 		}
-		proxywasm.LogInfof("%s", body)
+
+		for _, rule := range regexRules {
+			regex, err := regexp.Compile(rule)
+			if err != nil {
+				proxywasm.LogCriticalf("%v", err)
+			} else {
+				if regex.MatchString(string(body)) {
+					err := proxywasm.SendHttpResponse(302, nil, []byte(blockMessage), -1)
+					if err != nil {
+						proxywasm.LogCriticalf("%v", err)
+					}
+
+					return types.ActionPause
+				}
+			}
+		}
+
 		return types.ActionContinue
 	}
 	return types.ActionPause
