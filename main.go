@@ -58,7 +58,7 @@ func (*httpContext) OnHttpRequestHeaders(numHeaders int, endOfStream bool) types
 
 func (*httpContext) OnHttpRequestBody(bodySize int, endOfStream bool) types.Action {
 	if endOfStream {
-		body, err := proxywasm.GetHttpRequestBody(0 , bodySize)
+		body, err := proxywasm.GetHttpRequestBody(0, bodySize)
 		if err != nil {
 			proxywasm.LogCriticalf("failed to get request body: %v", err)
 		}

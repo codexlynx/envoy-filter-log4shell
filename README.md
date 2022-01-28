@@ -1,7 +1,7 @@
 # envoy-filter-log4shell
 Plugable Envoy WebAssembly L7 (HTTP) firewall to prevent log4shell vulnerability injections.
 
-[![AUR](https://img.shields.io/github/license/codexlynx/envoy-filter-log4shell)](LICENSE)
+[![](https://github.com/codexlynx/envoy-filter-log4shell/workflows/CI/badge.svg)](https://github.com/codexlynx/systemd-rest/actions) [![AUR](https://img.shields.io/github/license/codexlynx/envoy-filter-log4shell)](LICENSE)
 
 ## Compilation:
 #### Requirements:

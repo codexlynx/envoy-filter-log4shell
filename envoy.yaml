@@ -36,7 +36,7 @@ static_resources:
                             runtime: "envoy.wasm.runtime.v8"
                             code:
                               local:
-                                filename: "./filter-log4shell.wasm"
+                                filename: "/etc/envoy/filters/filter-log4shell.wasm"
                   - name: envoy.filters.http.router
 
 admin:
